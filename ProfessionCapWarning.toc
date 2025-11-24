@@ -1,0 +1,6 @@
+## Interface: 11200
+## Title: ProfessionCapWarning
+## Notes: Shows a warning when you need to go to trainer.
+## Author: gnomior
+
+ProfessionCapWarning.lua
