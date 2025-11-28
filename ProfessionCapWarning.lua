@@ -4,20 +4,33 @@ DEFAULT_CHAT_FRAME:AddMessage("ProfessionCapWarning: Starting to load...")
 local ADDON_NAME = "ProfessionCapWarning"
 local CHECK_INTERVAL = 10 -- seconds
 
--- Warning frame
-local warningFrame = CreateFrame("Frame", "ProfCapWarningFrame", UIParent)
-warningFrame:SetWidth(400)
-warningFrame:SetHeight(200)
-warningFrame:SetPoint("TOP", UIParent, "TOP", 0, -20)
-warningFrame:Hide()
+-- Right column frame (gathering profs) - anchored from center going right
+local rightFrame = CreateFrame("Frame", "ProfCapRightFrame", UIParent)
+rightFrame:SetWidth(350)
+rightFrame:SetHeight(300)
+rightFrame:SetPoint("TOPLEFT", UIParent, "TOP", 10, -20)
+rightFrame:Hide()
 
-DEFAULT_CHAT_FRAME:AddMessage("ProfessionCapWarning: Warning frame created")
+-- Right column text (left-aligned, text flows left to right from center)
+local rightText = rightFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+rightText:SetPoint("TOPLEFT", rightFrame, "TOPLEFT", 0, 0)
+rightText:SetJustifyH("LEFT")
+rightText:SetTextColor(1, 1, 1)
 
--- Warning text
-local warningText = warningFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-warningText:SetPoint("TOPLEFT", warningFrame, "TOPLEFT", 10, -10)
-warningText:SetJustifyH("LEFT")
-warningText:SetTextColor(1, 1, 1)
+-- Left column frame (crafting profs) - anchored from center going left
+local leftFrame = CreateFrame("Frame", "ProfCapLeftFrame", UIParent)
+leftFrame:SetWidth(350)
+leftFrame:SetHeight(300)
+leftFrame:SetPoint("TOPRIGHT", UIParent, "TOP", -10, -20)
+leftFrame:Hide()
+
+-- Left column text (right-aligned, text flows right to left from center)
+local leftText = leftFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+leftText:SetPoint("TOPRIGHT", leftFrame, "TOPRIGHT", 0, 0)
+leftText:SetJustifyH("RIGHT")
+leftText:SetTextColor(1, 1, 1)
+
+DEFAULT_CHAT_FRAME:AddMessage("ProfessionCapWarning: Warning frames created")
 
 -- Edge glow frames for urgent warnings
 local edgeGlow = {}
@@ -27,7 +40,7 @@ edgeGlow.textures = {}
 edgeGlow.top = CreateFrame("Frame", "ProfCapEdgeTop", UIParent)
 edgeGlow.top:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
 edgeGlow.top:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", 0, 0)
-edgeGlow.top:SetHeight(150)
+edgeGlow.top:SetHeight(200)
 edgeGlow.top:SetFrameStrata("BACKGROUND")
 edgeGlow.textures.top = edgeGlow.top:CreateTexture(nil, "BACKGROUND")
 edgeGlow.textures.top:SetAllPoints()
@@ -39,7 +52,7 @@ edgeGlow.top:Hide()
 edgeGlow.bottom = CreateFrame("Frame", "ProfCapEdgeBottom", UIParent)
 edgeGlow.bottom:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 0)
 edgeGlow.bottom:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0)
-edgeGlow.bottom:SetHeight(150)
+edgeGlow.bottom:SetHeight(200)
 edgeGlow.bottom:SetFrameStrata("BACKGROUND")
 edgeGlow.textures.bottom = edgeGlow.bottom:CreateTexture(nil, "BACKGROUND")
 edgeGlow.textures.bottom:SetAllPoints()
@@ -51,7 +64,7 @@ edgeGlow.bottom:Hide()
 edgeGlow.left = CreateFrame("Frame", "ProfCapEdgeLeft", UIParent)
 edgeGlow.left:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
 edgeGlow.left:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 0)
-edgeGlow.left:SetWidth(150)
+edgeGlow.left:SetWidth(200)
 edgeGlow.left:SetFrameStrata("BACKGROUND")
 edgeGlow.textures.left = edgeGlow.left:CreateTexture(nil, "BACKGROUND")
 edgeGlow.textures.left:SetAllPoints()
@@ -63,7 +76,7 @@ edgeGlow.left:Hide()
 edgeGlow.right = CreateFrame("Frame", "ProfCapEdgeRight", UIParent)
 edgeGlow.right:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", 0, 0)
 edgeGlow.right:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0)
-edgeGlow.right:SetWidth(150)
+edgeGlow.right:SetWidth(200)
 edgeGlow.right:SetFrameStrata("BACKGROUND")
 edgeGlow.textures.right = edgeGlow.right:CreateTexture(nil, "BACKGROUND")
 edgeGlow.textures.right:SetAllPoints()
@@ -371,6 +384,8 @@ local function CheckSingleProfession(profName, skillRank, skillMaxRank)
         status = status,
         color = color,
         skillText = skillRank .. "/" .. skillMaxRank,
+        skillRank = skillRank,
+        skillMaxRank = skillMaxRank,
         trainerSuggestion = trainerSuggestion,
         zoneSuggestion = zoneSuggestion,
         beastLevelRange = beastLevelRange,
@@ -451,93 +466,144 @@ local function UpdateDisplay()
         end
     end
 
-    -- Build zone frequency map for highlighting
-    local zoneFrequency = BuildZoneFrequencyMap(allProfessionInfo)
+    -- Separate gathering (excluding fishing), fishing, and crafting professions
+    local gatheringProfs = {}
+    local fishingProfs = {}
+    local craftingProfs = {}
 
-    -- Sort by priority (capped first, then ready, then normal)
-    table.sort(allProfessionInfo, function(a, b)
-        return a.priority < b.priority
-    end)
-
-    -- Build display message
-    if table.getn(allProfessionInfo) > 0 then
-        local message = ""
-        local maxUrgency = 0
-
-        for i, info in ipairs(allProfessionInfo) do
-            if i > 1 then
-                message = message .. "\n\n"
-            end
-
-            -- Main profession line
-            local line = info.color .. info.profession .. "|r " .. info.skillText
-            if info.trainerSuggestion and info.trainerSuggestion ~= "" then
-                line = line .. " - " .. info.trainerSuggestion
-            end
-            if info.beastLevelRange and info.beastLevelRange ~= "" then
-                line = line .. " (" .. info.beastLevelRange .. ")"
-            end
-
-            message = message .. line
-
-            -- Zone suggestions on separate line with frequency-based coloring
-            if info.zoneSuggestion and info.zoneSuggestion ~= "" then
-                local zoneList = {}
-                for zone in string.gfind(info.zoneSuggestion, "[^,]+") do
-                    -- Trim whitespace
-                    zone = string.gsub(zone, "^%s*(.-)%s*$", "%1")
-                    local frequency = zoneFrequency[zone] or 1
-                    table.insert(zoneList, {
-                        name = zone,
-                        freq = frequency
-                    })
-                end
-
-                -- Sort by frequency (highest first), then alphabetically
-                table.sort(zoneList, function(a, b)
-                    if a.freq ~= b.freq then
-                        return a.freq > b.freq
-                    else
-                        return a.name < b.name
-                    end
-                end)
-
-                -- Apply colors and build string
-                local coloredZones = {}
-                for _, zoneData in ipairs(zoneList) do
-                    table.insert(coloredZones, ColorZoneByFrequency(zoneData.name, zoneData.freq))
-                end
-                message = message .. "\n  " .. table.concat(coloredZones, ", ")
-            end
-
-            -- Track maximum urgency
-            if info.urgency > maxUrgency then
-                maxUrgency = info.urgency
-            end
-        end
-
-        warningText:SetText(message)
-        warningFrame:Show()
-
-        -- Update edge glow intensity based on maximum urgency
-        edgeGlow.intensity = maxUrgency
-        if maxUrgency > 0 then
-            -- Play sound only when first reaching urgent status
-            if maxUrgency >= 0.3 then
-                PlaySound("RaidWarning")
-            end
-            edgeGlow.top:Show()
-            edgeGlow.bottom:Show()
-            edgeGlow.left:Show()
-            edgeGlow.right:Show()
+    for _, info in ipairs(allProfessionInfo) do
+        if info.profession == "Fishing" then
+            table.insert(fishingProfs, info)
+        elseif IsGatheringProfession(info.profession) then
+            table.insert(gatheringProfs, info)
         else
-            edgeGlow.top:Hide()
-            edgeGlow.bottom:Hide()
-            edgeGlow.left:Hide()
-            edgeGlow.right:Hide()
+            table.insert(craftingProfs, info)
         end
+    end
+
+    -- Sort function: by urgency desc, then by maxRank desc (closer to 300 = higher)
+    local function sortByUrgencyAndMaxRank(a, b)
+        if a.urgency ~= b.urgency then
+            return a.urgency > b.urgency
+        end
+        return a.skillMaxRank > b.skillMaxRank
+    end
+
+    table.sort(gatheringProfs, sortByUrgencyAndMaxRank)
+    table.sort(fishingProfs, sortByUrgencyAndMaxRank)
+    table.sort(craftingProfs, sortByUrgencyAndMaxRank)
+
+    -- Build zone frequency map for highlighting (gathering + fishing only)
+    local gatheringAndFishing = {}
+    for _, info in ipairs(gatheringProfs) do table.insert(gatheringAndFishing, info) end
+    for _, info in ipairs(fishingProfs) do table.insert(gatheringAndFishing, info) end
+    local zoneFrequency = BuildZoneFrequencyMap(gatheringAndFishing)
+
+    -- Track maximum urgency across all
+    local maxUrgency = 0
+    for _, info in ipairs(allProfessionInfo) do
+        if info.urgency > maxUrgency then
+            maxUrgency = info.urgency
+        end
+    end
+
+    -- Build RIGHT column message (gathering + fishing): name, skill, trainer, zones
+    local rightMessage = ""
+    local rightProfs = {}
+    for _, info in ipairs(gatheringProfs) do table.insert(rightProfs, info) end
+    for _, info in ipairs(fishingProfs) do table.insert(rightProfs, info) end
+
+    for i, info in ipairs(rightProfs) do
+        if i > 1 then
+            rightMessage = rightMessage .. "\n\n"
+        end
+
+        -- Main profession line: name, skill, trainer info
+        local line = info.color .. info.profession .. "|r " .. info.skillText
+        if info.trainerSuggestion and info.trainerSuggestion ~= "" then
+            line = line .. " - " .. info.trainerSuggestion
+        end
+        if info.beastLevelRange and info.beastLevelRange ~= "" then
+            line = line .. " (" .. info.beastLevelRange .. ")"
+        end
+
+        rightMessage = rightMessage .. line
+
+        -- Zone suggestions on separate line with frequency-based coloring
+        if info.zoneSuggestion and info.zoneSuggestion ~= "" then
+            local zoneList = {}
+            for zone in string.gfind(info.zoneSuggestion, "[^,]+") do
+                zone = string.gsub(zone, "^%s*(.-)%s*$", "%1")
+                local frequency = zoneFrequency[zone] or 1
+                table.insert(zoneList, { name = zone, freq = frequency })
+            end
+
+            table.sort(zoneList, function(a, b)
+                if a.freq ~= b.freq then return a.freq > b.freq end
+                return a.name < b.name
+            end)
+
+            local coloredZones = {}
+            for _, zoneData in ipairs(zoneList) do
+                table.insert(coloredZones, ColorZoneByFrequency(zoneData.name, zoneData.freq))
+            end
+            rightMessage = rightMessage .. "\n  " .. table.concat(coloredZones, ", ")
+        end
+    end
+
+    -- Build LEFT column message (crafting): trainer info - skill - name (reversed order)
+    local leftMessage = ""
+    for i, info in ipairs(craftingProfs) do
+        if i > 1 then
+            leftMessage = leftMessage .. "\n\n"
+        end
+
+        -- Reversed order: trainer info - skill - name
+        local line = ""
+        if info.trainerSuggestion and info.trainerSuggestion ~= "" then
+            line = info.trainerSuggestion .. " - "
+        end
+        line = line .. info.skillText .. " " .. info.color .. info.profession .. "|r"
+
+        leftMessage = leftMessage .. line
+    end
+
+    -- Show/hide frames based on content
+    if rightMessage ~= "" then
+        rightText:SetText(rightMessage)
+        rightFrame:Show()
     else
-        warningFrame:Hide()
+        rightFrame:Hide()
+    end
+
+    if leftMessage ~= "" then
+        leftText:SetText(leftMessage)
+        leftFrame:Show()
+    else
+        leftFrame:Hide()
+    end
+
+    -- Update edge glow intensity based on maximum urgency
+    edgeGlow.intensity = maxUrgency
+    if maxUrgency > 0 then
+        if maxUrgency >= 0.3 then
+            PlaySound("RaidWarning")
+        end
+        edgeGlow.top:Show()
+        edgeGlow.bottom:Show()
+        edgeGlow.left:Show()
+        edgeGlow.right:Show()
+    else
+        edgeGlow.top:Hide()
+        edgeGlow.bottom:Hide()
+        edgeGlow.left:Hide()
+        edgeGlow.right:Hide()
+    end
+
+    -- Hide frames if nothing to show
+    if table.getn(allProfessionInfo) == 0 then
+        rightFrame:Hide()
+        leftFrame:Hide()
         edgeGlow.intensity = 0
         edgeGlow.top:Hide()
         edgeGlow.bottom:Hide()
@@ -566,8 +632,9 @@ local function UpdateEdgeGlowPulse()
         local pulseFactor = (math.sin(pulsePhase * 3.14159 * 2) + 1) / 2 -- 0 to 1
 
         -- Base alpha increases with urgency, pulse amplitude also increases
-        local baseAlpha = 0.2 + (edgeGlow.intensity * 0.3) -- 0.2 to 0.5
-        local pulseAmplitude = 0.2 + (edgeGlow.intensity * 0.3) -- 0.2 to 0.5
+        -- When capped (intensity = 1.0): baseAlpha = 0.6, amplitude = 0.4, max alpha = 1.0
+        local baseAlpha = 0.3 + (edgeGlow.intensity * 0.3) -- 0.3 to 0.6
+        local pulseAmplitude = 0.2 + (edgeGlow.intensity * 0.2) -- 0.2 to 0.4
         local alpha = baseAlpha + (pulseFactor * pulseAmplitude)
 
         -- Update all edge textures with pulsing alpha
