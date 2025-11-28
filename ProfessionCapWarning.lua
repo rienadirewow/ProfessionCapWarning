@@ -83,54 +83,32 @@ local lastUpdate = 0
 -- Zone data extracted from wow-professions.com guides
 local ZONE_DATA = {
     ["Herbalism"] = {
-        [1] = {"Elwynn Forest", "Durotar", "Teldrassil", "Dun Morogh", "Tirisfal Glades"},
-        [50] = {"Westfall", "The Barrens", "Darkshore", "Loch Modan", "Silverpine Forest"},
-        [100] = {"Redridge Mountains", "Stonetalon Mountains", "Wetlands", "Ashenvale"},
-        [125] = {"Stranglethorn Vale", "Arathi Highlands", "Desolace", "Thousand Needles", "Hillsbrad Foothills"},
-        [160] = {"Stranglethorn Vale", "Tanaris", "Azshara", "The Hinterlands"},
-        [185] = {"Azshara", "Felwood", "Un'Goro Crater", "The Hinterlands"},
-        [210] = {"Felwood", "Un'Goro Crater", "Western Plaguelands"},
-        [235] = {"Eastern Plaguelands", "Winterspring", "Western Plaguelands"},
-        [250] = {"Eastern Plaguelands", "Winterspring"},
-        [270] = {"Eastern Plaguelands", "Winterspring"}
+        [1] = {"Elwynn Forest", "Durotar", "Teldrassil", "Dun Morogh", "Tirisfal Glades", "Mulgore"},
+        [70] = {"The Barrens", "Silverpine Forest", "Loch Modan", "Darkshore"},
+        [115] = {"Hillsbrad Foothills", "Wetlands", "Stonetalon Mountains"},
+        [170] = {"Stranglethorn Vale", "Arathi Highlands"},
+        [205] = {"Tanaris", "Searing Gorge"},
+        [230] = {"The Hinterlands"},
+        [270] = {"Felwood", "Eastern Plaguelands", "Winterspring"}
     },
     ["Fishing"] = {
-        [1] = {"Elwynn Forest", "Durotar", "Teldrassil", "Dun Morogh", "Tirisfal Glades"},
-        [50] = {"Westfall", "The Barrens", "Loch Modan", "Silverpine Forest"},
-        [75] = {"Redridge Mountains", "Wetlands", "Darkshore", "Hillsbrad Foothills"},
-        [100] = {"Stranglethorn Vale", "Arathi Highlands", "Desolace", "Thousand Needles"},
-        [130] = {"Stranglethorn Vale", "Tanaris", "Desolace", "Dustwallow Marsh"},
-        [150] = {"Stranglethorn Vale", "Tanaris", "Azshara", "Feralas"},
-        [175] = {"Azshara", "Feralas", "The Hinterlands", "Un'Goro Crater"},
-        [200] = {"Azshara", "Felwood", "Un'Goro Crater", "Western Plaguelands"},
-        [225] = {"Eastern Plaguelands", "Winterspring", "Western Plaguelands"},
-        [250] = {"Eastern Plaguelands", "Winterspring"}
+        [1] = {"Elwynn Forest", "Durotar", "Teldrassil", "Dun Morogh", "Tirisfal Glades", "Mulgore"},
+        [75] = {"The Barrens", "Darkshore", "Ironforge", "Loch Modan", "Silverpine Forest", "Westfall"},
+        [150] = {"Dustwallow Marsh", "Alterac Mountains", "Arathi Highlands", "Desolace", "Stranglethorn Vale", "Swamp of Sorrows", "Thousand Needles"},
+        [225] = {"Felwood", "Feralas", "The Hinterlands", "Tanaris", "Un'Goro Crater", "Western Plaguelands"}
     },
     ["Mining"] = {
-        [1] = {"Durotar", "Mulgore", "Tirisfal Glades", "Elwynn Forest", "Darkshore", "Dun Morogh"},
+        [1] = {"Durotar", "Mulgore", "Tirisfal Glades", "Elwynn Forest", "Darkshore", "Dun Morogh", "Venture Co. Mine (Durotar)"},
         [65] = {"Hillsbrad Foothills", "Redridge Mountains", "Ashenvale", "The Barrens"},
-        [100] = {"Arathi Highlands", "Desolace", "Thousand Needles", "Stranglethorn Vale"},
-        [125] = {"Arathi Highlands", "Desolace", "Thousand Needles"},
-        [155] = {"The Hinterlands", "Tanaris", "Azshara"},
+        [125] = {"Arathi Highlands", "Desolace", "Thousand Needles", "Stranglethorn Vale"},
         [175] = {"The Hinterlands", "Tanaris"},
-        [200] = {"Un'Goro Crater", "Blasted Lands", "Felwood"},
-        [230] = {"Un'Goro Crater", "Blasted Lands", "Felwood"},
-        [245] = {"Un'Goro Crater", "Eastern Plaguelands", "Winterspring", "Burning Steppes"},
-        [275] = {"Eastern Plaguelands", "Winterspring", "Burning Steppes"}
+        [245] = {"Un'Goro Crater", "Blasted Lands", "Felwood", "Eastern Plaguelands", "Winterspring", "Burning Steppes"}
     },
     ["Skinning"] = {
         [1] = {"Durotar", "Dun Morogh", "Elwynn Forest", "Teldrassil"},
-        [25] = {"The Barrens", "Loch Modan", "Westfall", "Darkshore"},
-        [50] = {"The Barrens", "Loch Modan", "Wetlands", "Redridge Mountains"},
         [75] = {"The Barrens", "Loch Modan", "Wetlands", "Hillsbrad Foothills"},
-        [100] = {"Stranglethorn Vale", "Arathi Highlands", "Desolace"},
-        [125] = {"Stranglethorn Vale", "Arathi Highlands", "Thousand Needles"},
         [155] = {"Thousand Needles", "Arathi Highlands", "Tanaris"},
-        [180] = {"Feralas", "The Hinterlands", "Azshara"},
-        [205] = {"Feralas", "Un'Goro Crater", "Felwood"},
-        [230] = {"Un'Goro Crater", "Felwood", "Western Plaguelands"},
-        [250] = {"Eastern Plaguelands", "Winterspring", "Western Plaguelands"},
-        [275] = {"Eastern Plaguelands", "Winterspring"}
+        [205] = {"Feralas", "Un'Goro Crater", "Felwood", "Eastern Plaguelands", "Winterspring"}
     }
 }
 
@@ -153,32 +131,65 @@ end
 local SPECIAL_TRAINERS = {
     ["Alchemy"] = {
         [150] = {
-            alliance = "Expert Alchemy trainer (Darnassus)",
-            horde = "Expert Alchemy trainer (Undercity)"
+            alliance = "Expert: Darnassus trainer",
+            horde = "Expert: Undercity trainer"
         },
         [225] = {
-            alliance = "Artisan Alchemy trainer (Feralas)",
-            horde = "Artisan Alchemy trainer (Swamp of Sorrows)"
+            alliance = "Artisan: Feralas trainer",
+            horde = "Artisan: Swamp of Sorrows trainer"
         }
     },
-    ["Fishing"] = {
+    ["Blacksmithing"] = {
+        [225] = "Artisan: Brikk Keencraft (Booty Bay, STV) - lvl 35+"
+    },
+    ["Enchanting"] = {
         [150] = {
-            alliance = "Buy Expert Fishing book in STV (Old Man Heming)",
-            horde = "Buy Expert Fishing book in STV (Old Man Heming)"
+            alliance = "Expert: Kitta Firewind (Tower of Azora, Elwynn) - lvl 20+",
+            horde = "Expert: Hgarth (Sun Rock Retreat, Stonetalon) - lvl 20+"
         },
-        [225] = {
-            alliance = "Nat Pagle Quest (Dustwallow Marsh)",
-            horde = "Nat Pagle Quest (Dustwallow Marsh)"
-        }
+        [225] = "Artisan: Annora (Uldaman instance, Badlands) - lvl 35+"
+    },
+    ["Engineering"] = {
+        [225] = "Artisan: Buzzek Bracketswing (Gadgetzan, Tanaris) - lvl 35+"
+    },
+    ["Fishing"] = {
+        [150] = "Expert: Buy book from Old Man Heming (STV)",
+        [225] = "Artisan: Nat Pagle Quest (Dustwallow Marsh)"
     },
     ["First Aid"] = {
         [150] = {
-            alliance = "Buy Expert First Aid book (Theramore or Stromgarde)",
-            horde = "Buy Expert First Aid book (Brackenwall or Hammerfall)"
+            alliance = "Expert: Buy book (Theramore or Stromgarde)",
+            horde = "Expert: Buy book (Brackenwall or Hammerfall)"
         },
         [225] = {
-            alliance = "Triage quest (Theramore, Dustwallow Marsh)",
-            horde = "Triage quest (Brackenwall, Dustwallow Marsh)"
+            alliance = "Artisan: Triage quest (Theramore, Dustwallow)",
+            horde = "Artisan: Triage quest (Brackenwall, Dustwallow)"
+        }
+    },
+    ["Leatherworking"] = {
+        [150] = {
+            alliance = "Expert: Telonis (Darnassus)",
+            horde = "Expert: Una (Thunder Bluff)"
+        },
+        [225] = {
+            alliance = "Artisan: Drakk Stonehand (Aerie Peak, Hinterlands)",
+            horde = "Artisan: Hahrana Ironhide (Camp Mojache, Feralas)"
+        }
+    },
+    ["Skinning"] = {
+        [150] = {
+            alliance = "Expert: Major cities",
+            horde = "Expert: Dranh (Camp Taurajo, Barrens)"
+        },
+        [225] = {
+            alliance = "Artisan: Major cities",
+            horde = "Artisan: Kulleg Stonehorn (Camp Mojache, Feralas)"
+        }
+    },
+    ["Tailoring"] = {
+        [225] = {
+            alliance = "Artisan: Timothy Worthington (Theramore, Dustwallow)",
+            horde = "Artisan: Daryl Stack (Tarren Mill, Hillsbrad)"
         }
     }
 }
