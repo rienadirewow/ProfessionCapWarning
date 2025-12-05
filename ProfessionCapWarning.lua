@@ -347,15 +347,17 @@ local function CheckSingleProfession(profName, skillRank, skillMaxRank)
     local beastLevelRange = ""
     local urgency = 0 -- 0 = normal, 0-1 = ready, 1 = capped
 
-    -- Check if capped (red priority)
+    -- Check if capped (red priority) - but no urgency if already at max training (300)
     if skillRank >= skillMaxRank then
         status = "capped"
         color = "|cffFF0000" -- Red
         trainerSuggestion = GetTrainerSuggestion(profName, skillRank, skillMaxRank) or "Visit trainer"
-        urgency = 1.0
-        -- Check if can train (orange priority)
+        if skillMaxRank < 300 then
+            urgency = 1.0
+        end
+        -- Check if can train (orange priority) - only for sub-300 caps
     elseif (skillMaxRank == 75 and skillRank >= 50) or (skillMaxRank == 150 and skillRank >= 125) or
-        (skillMaxRank == 225 and skillRank >= 200) or (skillMaxRank >= 300 and skillRank >= 275) then
+        (skillMaxRank == 225 and skillRank >= 200) then
         status = "ready"
         color = "|cffFF8000" -- Orange
         trainerSuggestion = GetTrainerSuggestion(profName, skillRank, skillMaxRank) or "Ready to train"
