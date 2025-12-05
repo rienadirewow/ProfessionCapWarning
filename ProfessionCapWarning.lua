@@ -111,17 +111,19 @@ local ZONE_DATA = {
         [225] = {"Felwood", "Feralas", "The Hinterlands", "Tanaris", "Un'Goro Crater", "Western Plaguelands"}
     },
     ["Mining"] = {
-        [1] = {"Durotar", "Mulgore", "Tirisfal Glades", "Elwynn Forest", "Darkshore", "Dun Morogh", "Venture Co. Mine (Durotar)"},
+        [1] = {"Durotar", "Mulgore", "Tirisfal Glades", "Elwynn Forest", "Darkshore", "Dun Morogh"},
         [65] = {"Hillsbrad Foothills", "Redridge Mountains", "Ashenvale", "The Barrens"},
         [125] = {"Arathi Highlands", "Desolace", "Thousand Needles", "Stranglethorn Vale"},
-        [175] = {"The Hinterlands", "Tanaris"},
-        [245] = {"Un'Goro Crater", "Blasted Lands", "Felwood", "Eastern Plaguelands", "Winterspring", "Burning Steppes"}
+        [175] = {"The Hinterlands", "Tanaris", "Badlands", "Searing Gorge"},
+        [225] = {"Burning Steppes", "Searing Gorge", "Badlands", "Tanaris"},
+        [250] = {"Un'Goro Crater", "Eastern Plaguelands", "Winterspring", "Burning Steppes"}
     },
     ["Skinning"] = {
         [1] = {"Durotar", "Dun Morogh", "Elwynn Forest", "Teldrassil"},
         [75] = {"The Barrens", "Loch Modan", "Wetlands", "Hillsbrad Foothills"},
-        [155] = {"Thousand Needles", "Arathi Highlands", "Tanaris"},
-        [205] = {"Feralas", "Un'Goro Crater", "Felwood", "Eastern Plaguelands", "Winterspring"}
+        [155] = {"Thousand Needles", "Arathi Highlands", "Stranglethorn Vale", "Desolace"},
+        [215] = {"Tanaris", "Feralas", "The Hinterlands", "Azshara"},
+        [260] = {"Un'Goro Crater", "Felwood", "Eastern Plaguelands", "Winterspring"}
     }
 }
 
@@ -144,26 +146,44 @@ end
 local SPECIAL_TRAINERS = {
     ["Alchemy"] = {
         [150] = {
-            alliance = "Expert: Darnassus trainer",
-            horde = "Expert: Undercity trainer"
+            alliance = "Expert: Ainethil (Darnassus)",
+            horde = "Expert: Doctor Herbert Halsey (Undercity)"
         },
         [225] = {
-            alliance = "Artisan: Feralas trainer",
-            horde = "Artisan: Swamp of Sorrows trainer"
+            alliance = "Artisan: Kylanna Windwhisper (Feathermoon, Feralas)",
+            horde = "Artisan: Rogvar (Stonard, Swamp of Sorrows)"
         }
     },
     ["Blacksmithing"] = {
-        [225] = "Artisan: Brikk Keencraft (Booty Bay, STV) - lvl 35+"
+        [150] = {
+            alliance = "Expert: Bengus Deepforge (Ironforge)",
+            horde = "Expert: Saru Steelfury (Orgrimmar)"
+        },
+        [225] = "Artisan: Brikk Keencraft (Booty Bay, STV)"
+    },
+    ["Cooking"] = {
+        [150] = {
+            alliance = "Expert: Buy book from Shandrina (Ashenvale)",
+            horde = "Expert: Buy book from Wulan (Shadowprey, Desolace)"
+        },
+        [225] = {
+            alliance = "Artisan: Quest from Daryl Riknussun (Ironforge)",
+            horde = "Artisan: Quest from Zamja (Orgrimmar)"
+        }
     },
     ["Enchanting"] = {
         [150] = {
-            alliance = "Expert: Kitta Firewind (Tower of Azora, Elwynn) - lvl 20+",
-            horde = "Expert: Hgarth (Sun Rock Retreat, Stonetalon) - lvl 20+"
+            alliance = "Expert: Kitta Firewind (Tower of Azora, Elwynn)",
+            horde = "Expert: Hgarth (Sun Rock Retreat, Stonetalon)"
         },
-        [225] = "Artisan: Annora (Uldaman instance, Badlands) - lvl 35+"
+        [225] = "Artisan: Annora (Uldaman instance, Badlands)"
     },
     ["Engineering"] = {
-        [225] = "Artisan: Buzzek Bracketswing (Gadgetzan, Tanaris) - lvl 35+"
+        [150] = {
+            alliance = "Expert: Springspindle Fizzlegear (Ironforge)",
+            horde = "Expert: Roxxik (Orgrimmar)"
+        },
+        [225] = "Artisan: Buzzek Bracketswing (Gadgetzan, Tanaris)"
     },
     ["Fishing"] = {
         [150] = "Expert: Buy book from Old Man Heming (STV)",
@@ -189,17 +209,11 @@ local SPECIAL_TRAINERS = {
             horde = "Artisan: Hahrana Ironhide (Camp Mojache, Feralas)"
         }
     },
-    ["Skinning"] = {
-        [150] = {
-            alliance = "Expert: Major cities",
-            horde = "Expert: Dranh (Camp Taurajo, Barrens)"
-        },
-        [225] = {
-            alliance = "Artisan: Major cities",
-            horde = "Artisan: Kulleg Stonehorn (Camp Mojache, Feralas)"
-        }
-    },
     ["Tailoring"] = {
+        [150] = {
+            alliance = "Expert: Georgio Bolero (Stormwind)",
+            horde = "Expert: Josef Gregorian (Undercity)"
+        },
         [225] = {
             alliance = "Artisan: Timothy Worthington (Theramore, Dustwallow)",
             horde = "Artisan: Daryl Stack (Tarren Mill, Hillsbrad)"
